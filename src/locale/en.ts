@@ -156,7 +156,7 @@ I18n.translations.en = {
             description_en: "Description in English",
             title_nl_ro: "Title in Dutch - readonly",
             description_nl_ro: "Description in Dutch - readonly",
-            // ESnet
+            // ESnet (plz keep sorted)
             add_notes: "Any notes?",
             add_notes_info: "Add notes here",
             admin_state: "Select the admin state for the Service Edge",
