@@ -156,7 +156,7 @@ I18n.translations.en = {
             description_en: "Description in English",
             title_nl_ro: "Title in Dutch - readonly",
             description_nl_ro: "Description in Dutch - readonly",
-            // ESnet (plz keep sorted)
+            // ESnet (plz keep sorted the Transformer VSC ext is your friend)
             add_notes: "Any notes?",
             add_notes_info: "Add notes here",
             admin_state: "Select the admin state for the Service Edge",
@@ -1026,7 +1026,7 @@ I18n.translations.en = {
     },
     workflow: {
         // These are all ESnet - the new UI didn't have this section defined
-        // as above plz keep sorted.
+        // as above plz keep sorted the Transformer VSC ext is your friend.
         add_nodes_prefix_list: "Add Nodes",
         autodeploy_prefix_list: "Automatically add/remove nodes and redeploy",
         circuit_transition_service: "Transition a circuit from ESnet5 to ESnet5.5 ",
