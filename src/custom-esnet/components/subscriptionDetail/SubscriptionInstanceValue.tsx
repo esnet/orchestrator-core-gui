@@ -52,7 +52,7 @@ function SubscriptionInstanceValueRow({
         isSubscriptionValue && !subscriptionIsLoading && !subscriptionError
             ? `${subscriptionData?.description} (${value})`
             : value;
-    console.log("XXX", label, value, isSubscriptionValue, isDeleted, isExternalLinkValue, type)
+
     return (
         <tbody className={theme}>
             <tr>
