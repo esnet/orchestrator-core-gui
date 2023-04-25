@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 SURF.
+ * Copyright 2019-2020 SURF.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,13 @@
  * limitations under the License.
  *
  */
-
-import { EuiButtonIcon, EuiCopy, EuiFlexGroup, EuiFlexItem } from "@elastic/eui";
-import React, { useContext, useState } from "react";
+import { ApiClient } from "api";
+import SubscriptionDetails from "components/subscriptionDetail/SubscriptionDetails";
+import React, { useContext, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { useQuery } from "react-query";
 import ApplicationContext from "utils/ApplicationContext";
+import { enrichSubscription } from "utils/Lookups";
+import { SubscriptionModel } from "utils/types";
 
 function SubscriptionInstanceValueRow({
     label,
@@ -38,23 +39,9 @@ function SubscriptionInstanceValueRow({
     type: string;
 }>) {
     const icon = children ? "minus" : "plus";
-    const { apiClient, theme } = useContext(ApplicationContext);
-
-    const { isLoading: subscriptionIsLoading, error: subscriptionError, data: subscriptionData } = useQuery(
-        ["subscription", { id: isSubscriptionValue ? value : "disabled" }],
-        () => apiClient.subscriptionsDetailWithModel(value),
-        {
-            enabled: isSubscriptionValue,
-        }
-    );
-
-    const subscriptionLink =
-        isSubscriptionValue && !subscriptionIsLoading && !subscriptionError
-            ? `${subscriptionData?.description} (${value})`
-            : value;
 
     return (
-        <tbody className={theme}>
+        <tbody>
             <tr>
                 <td>{label.toUpperCase()}</td>
                 <td colSpan={isDeleted ? 1 : 2}>
@@ -63,16 +50,9 @@ function SubscriptionInstanceValueRow({
                             <i className={`fa fa-${icon}-circle`} onClick={toggleCollapsed} />
                         )}
                         {isSubscriptionValue && (
-                            <EuiFlexGroup alignItems={"center"}>
-                                <EuiFlexItem grow={false}>
-                                    <a target="_blank" rel="noopener noreferrer" href={`/subscriptions/${value}`}>
-                                        {subscriptionLink}
-                                    </a>
-                                </EuiFlexItem>
-                                <EuiCopy textToCopy={value}>
-                                    {(copy) => <EuiButtonIcon iconType={"copyClipboard"} onClick={copy} />}
-                                </EuiCopy>
-                            </EuiFlexGroup>
+                            <a target="_blank" rel="noopener noreferrer" href={`/subscriptions/${value}`}>
+                                {value}
+                            </a>
                         )}
 
                         {!isSubscriptionValue && <span>{value?.toString()}</span>}
@@ -103,13 +83,59 @@ interface IProps {
     value: string;
 }
 
+export function getExternalTypeData(
+    type: string,
+    apiClient: ApiClient
+): { getter: (identifier: string) => Promise<any>; render?: (data: any) => React.ReactNode; i18nKey: string } {
+    switch (type) {
+        case "node_a_subscription_id":
+        case "node_z_subscription_id":
+        case "node_enrollment_subscription_id":
+        case "node_subscription_id":
+        case "physical_connection_subscription_id":
+        case "prefix_list_subscription_id":
+        case "mirror_sources_subscription_id":
+        case "service_edge_subscription_id":
+            return {
+                getter: (identifier: string) => apiClient.subscriptionsDetailWithModel(identifier),
+                render: (data: SubscriptionModel) => (
+                    <SubscriptionDetails subscription={data} className="related-subscription" />
+                ),
+                i18nKey: "subscription",
+            };
+        default:
+            return {
+                getter: (_: string) => Promise.resolve({}),
+                render: undefined,
+                i18nKey: "",
+            };
+    }
+}
+
 export default function SubscriptionInstanceValue({ label, value }: IProps) {
     const [collapsed, setCollapsed] = useState(true);
-    const [data] = useState<any | null | undefined>(undefined);
+    const [data, setData] = useState<any | null | undefined>(undefined);
+
+    const { organisations, products, apiClient } = useContext(ApplicationContext);
+    const { render, i18nKey, getter } = getExternalTypeData(label, apiClient);
 
     const isSubscriptionValue = label.endsWith("subscription_id");
-    const isExternalLinkValue = false;
+    const isExternalLinkValue = !!render;
     const isDeleted = isExternalLinkValue && data === null;
+
+    useEffect(() => {
+        if (data === undefined && !collapsed && isExternalLinkValue) {
+            getter(value)
+                .catch((err) => Promise.resolve(null))
+                .then((data) => {
+                    if (data && isSubscriptionValue) {
+                        data.product_id = data.product.product_id;
+                        enrichSubscription(data as SubscriptionModel, organisations, products);
+                    }
+                    setData(data);
+                });
+        }
+    }, [data, collapsed, isSubscriptionValue, isExternalLinkValue, getter, value, organisations, products]);
 
     return (
         <SubscriptionInstanceValueRow
@@ -119,9 +145,9 @@ export default function SubscriptionInstanceValue({ label, value }: IProps) {
             isDeleted={isDeleted}
             isExternalLinkValue={isExternalLinkValue}
             toggleCollapsed={() => setCollapsed(!collapsed)}
-            type={label}
+            type={i18nKey}
         >
-            {!!data && !collapsed && data}
+            {!!data && !collapsed && !!render && render(data)}
         </SubscriptionInstanceValueRow>
     );
 }
