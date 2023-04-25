@@ -75,7 +75,7 @@ function SubscriptionInstanceValueRow({
                             </EuiFlexGroup>
                         )}
 
-                        {!isSubscriptionValue && <span>{value.toString()}</span>}
+                        {!isSubscriptionValue && <span>{value?.toString()}</span>}
                     </div>
                 </td>
                 {isDeleted && (
