@@ -581,6 +581,8 @@ I18n.translations.en = {
             "This subscription can not be modified because of the status: {{status}}. Only subscriptions with status {{usable_when}} can be {{action}}.",
         no_modify_deleted_related_objects:
             "This subscription can not be modified because it contains references to other systems (e.g. IMS) that are deleted.",
+        no_modify_subscription_in_use_by_others:
+            "This subscription can not be modified because it is a dependency of other active subscriptions.",
         not_in_sync:
             "This subscription can not be modified because it is not in sync. This means there is some error in the registration of the subscription or that it is being modified by another workflow.",
         relations_not_in_sync:
