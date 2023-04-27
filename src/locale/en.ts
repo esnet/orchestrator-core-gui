@@ -1054,7 +1054,7 @@ I18n.translations.en = {
         pcs_add_lag_members: "Add new lag members based on new ESDB data",
         pcs_remove_lag_members: "Remove lag members based on new ESDB data",
         provision_node_enrollment: "Add device to system service (prep for backbone link service)",
-        provision_node_enrollment_tpdr: "Fetch SSH host keys and sync-from",
+        provision_node_enrollment_tpdr: "Fetch SSH host keys and sync-from (provision)",
         redeploy_ecmp_group: "Redeploy ECMP group to NSO",
         redeploy_group_member: "Redeploy ECMP group member to NSO",
         redeploy_ihc: "Redeploy Host",
